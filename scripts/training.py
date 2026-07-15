@@ -43,7 +43,9 @@ def main():
     lr = 0.0005
     optimizer = optim.RMSprop(model.parameters(), lr=lr)
 
+    max_val_acc = 0
     device = torch.device('cuda')
+    # device = torch.device('cpu')
     model.to(device)
 
     for i in range(n_epoch):
@@ -65,12 +67,17 @@ def main():
 
         # Validating
         model.eval()
+        seen = 0
+        n_correct = 0
         val_dl = DataLoader(val_ds, batch_size=1, shuffle=False)
         with torch.no_grad():
             for (x, y) in val_dl:
                 x = x.to(device)
                 y = y.to(device)
                 outputs, (h, c) = model(x)
+
+        if n_correct / seen > max_val_acc:
+            max_val_acc = n_correct / seen
         torch.save(model.state_dict(), 'New_LSTM_model_0416_2.pt')
 
 
